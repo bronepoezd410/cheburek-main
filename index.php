@@ -136,7 +136,7 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
         <div class="box-container">
             <?php while ($row = mysqli_fetch_assoc($result)): ?>
                 <div class="box" data-item-id="<?= $row['item_id'] ?>" data-category="<?= $row['category_id'] ?>">
-                    <img src="images/menu-1.jpg" alt="">
+                    <img src="<?= $row['image_url'] ?>" alt="">
 
                     <h3>
                         <?= $row['item_name'] ?>
@@ -173,6 +173,7 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
 
                 <input type="file" id="itemImageInput" name="itemImage" accept="image/*">
                 <img id="itemImage" src="" alt="">
+                <p>НОВОЕ ИЗОБРАЖЕНИЕ В СПИСКЕ ТОВАРОВ ПОЯВИТСЯ ТОЛЬКО ПОСЛЕ ПЕРЕЗАГРУЗКИ СТРАНИЦЫ </p>
 
                 <div class="input-container">
                     <label for="itemName">Название товара:</label>

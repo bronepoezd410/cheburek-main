@@ -48,15 +48,14 @@ editButtons.forEach((button) => {
                     document.getElementById('itemId').value = itemId;
                     document.getElementById('itemName').value = data.item_name;
                     document.getElementById('itemPrice').value = data.price;
-
                     const itemImage = document.getElementById('itemImage');
-                    if (data.image_path) {
-                        itemImage.src = data.image_path;
+
+                    if (data.image_url) {
+                        itemImage.src = data.image_url;
                     } else {
                         itemImage.src = ''; // Если изображения нет, очищаем src
                     }
 
-                    console.log(data);
                     // Открываем модальное окно
                     modal.style.display = 'block';
 
@@ -91,6 +90,9 @@ editSubmitButton.addEventListener('click', () => {
     const itemId = document.getElementById('itemId').value;
     const itemName = document.getElementById('itemName').value;
     const itemPrice = document.getElementById('itemPrice').value;
+
+
+
     const selectedCategoryId = categorySelect.value;
     const itemImageFile = itemImageInput.files[0]; // Получаем выбранный файл изображения
 
@@ -105,26 +107,22 @@ editSubmitButton.addEventListener('click', () => {
     // Очищаем ошибку, если категория выбрана
     categoryError.textContent = '';
 
-    // Создаем объект с данными для отправки
-    const requestData = {
-        itemId: itemId,
-        itemName: itemName,
-        itemPrice: itemPrice,
-        categoryId: selectedCategoryId,
-    };
+    // Создаем объект FormData для отправки данных на сервер
+    const formData = new FormData();
+    formData.append('itemId', itemId);
+    formData.append('itemName', itemName);
+    formData.append('itemPrice', itemPrice);
+    formData.append('categoryId', selectedCategoryId);
 
-    // Создаем объект с изображением для отправки (если оно выбрано)
+    // Добавляем файл изображения в FormData, если он выбран
     if (itemImageFile) {
-        requestData.itemImage = itemImageFile;
+        formData.append('itemImage', itemImageFile);
     }
 
-    // Отправляем данные на сервер в формате JSON
+    // Отправляем данные на сервер
     fetch('/config/update.php', {
         method: 'POST',
-        body: JSON.stringify(requestData),
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        body: formData
     })
         .then((response) => response.json())
         .then((data) => {
@@ -175,7 +173,6 @@ categorySelect.addEventListener('change', (event) => {
 document.addEventListener('DOMContentLoaded', function () {
     // Получите itemId из вашей HTML-разметки
     const itemId = document.getElementById('itemId').value;
-    console.log(itemId);
     // Выполните AJAX-запрос после получения itemId
     fetch('/config/categories.php')
         .then((response) => response.json())

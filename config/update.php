@@ -7,33 +7,38 @@ function saveItemImage($itemId, $itemImage)
 {
     // Здесь ваш код для сохранения изображения
     // Например, вы можете использовать move_uploaded_file для сохранения файла
-    $uploadDir = 'images';
-    $imageName = $itemId . '_' . $itemImage->name;
+    
+    $uploadDir = '../images/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true); // Создать папку, если она не существует
+    }
+    $imageName = $itemId . '_' . basename($itemImage['name']);
     $targetFilePath = $uploadDir . $imageName;
-    if (move_uploaded_file($itemImage->tmp_name, $targetFilePath)) {
+
+    if (move_uploaded_file($itemImage['tmp_name'], $targetFilePath)) {
         return $targetFilePath; // Возвращаем путь к сохраненному изображению
     } else {
-        error_log('Error saving image'); // Ошибка сохранения изображения
+        // Добавьте отладочный вывод для вывода сообщения об ошибке
+        error_log("Error saving image: Failed to move the uploaded file");
         return false; // Возвращаем false в случае ошибки сохранения
     }
 }
 
 // Проверка, является ли запрос POST-запросом
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Получение данных из тела запроса
-    $requestData = json_decode(file_get_contents("php://input"));
-    // Получаем данные из запроса
-    $itemId = $requestData->itemId;
-    $itemName = $requestData->itemName;
-    $itemPrice = $requestData->itemPrice;
-    $categoryId = $requestData->categoryId;
+    // Получение данных из формы
+    $itemId = $_POST['itemId'];
+    $itemName = $_POST['itemName'];
+    $itemPrice = $_POST['itemPrice'];
+    $categoryId = $_POST['categoryId'];
 
     // Обработка изображения, если оно передано
-    if (isset($requestData->itemImage)) {
-        $itemImage = $requestData->itemImage;
-        error_log("requestData: " . print_r($requestData, true));
+    if (isset($_FILES['itemImage'])) {
+        $itemImage = $_FILES['itemImage'];
+
         // Сохраняем изображение и получаем путь к нему
         $imagePath = saveItemImage($itemId, $itemImage);
+
         if ($imagePath) {
             // Если изображение успешно сохранено, обновляем информацию о товаре в базе данных
             $sql = "UPDATE MenuItems SET item_name = ?, price = ?, category_id = ?, image_url = ? WHERE item_id = ?";
@@ -44,16 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Возвращаем успешный результат
                 echo json_encode(['success' => true]);
             } else {
-                error_log('Error updating item'); // Ошибка при обновлении
+                // Возвращаем ошибку, если обновление не удалось
                 echo json_encode(['error' => 'Error updating item']);
             }
 
             // Закрываем подготовленное выражение
             mysqli_stmt_close($stmt);
         } else {
-            error_log('Error saving image'); // Ошибка сохранения изображения
+            // Добавьте отладочный вывод для вывода сообщения об ошибке
+            error_log("Error saving image: Image was not saved successfully");
+            // Возвращаем ошибку, если сохранение изображения не удалось
             echo json_encode(['error' => 'Error saving image']);
-
         }
     } else {
         // Если изображение не передано, обновляем информацию о товаре без изображения
@@ -65,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Возвращаем успешный результат
             echo json_encode(['success' => true]);
         } else {
-            error_log('Error updating item'); // Ошибка при обновлении
+            // Возвращаем ошибку, если обновление не удалось
             echo json_encode(['error' => 'Error updating item']);
         }
 
@@ -73,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($stmt);
     }
 } else {
-    error_log('Invalid request method'); // Ошибка недопустимого метода запроса
     // Возвращаем ошибку, если запрос не является POST-запросом
     echo json_encode(['error' => 'Invalid request method']);
 }
