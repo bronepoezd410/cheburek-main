@@ -170,6 +170,10 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
             <h2>Редактировать товар</h2>
             <form id="editForm" enctype="multipart/form-data">
                 <input type="hidden" id="itemId" name="itemId">
+
+                <input type="file" id="itemImageInput" name="itemImage" accept="image/*">
+                <img id="itemImage" src="" alt="">
+
                 <div class="input-container">
                     <label for="itemName">Название товара:</label>
                     <input type="text" id="itemName" name="itemName" required>

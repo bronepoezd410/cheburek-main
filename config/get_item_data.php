@@ -22,6 +22,12 @@ if (isset($_GET['itemId'])) {
 
             // Проверяем, есть ли результат
             if ($row = mysqli_fetch_assoc($result)) {
+                $imagePath = $row['image_url'];
+
+                // Добавляем путь к изображению в массив данных о товаре
+                $row['image_url'] = $imagePath;
+
+
                 // Отправляем данные о товаре в формате JSON
                 echo json_encode($row);
             } else {

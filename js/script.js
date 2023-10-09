@@ -49,8 +49,17 @@ editButtons.forEach((button) => {
                     document.getElementById('itemName').value = data.item_name;
                     document.getElementById('itemPrice').value = data.price;
 
+                    const itemImage = document.getElementById('itemImage');
+                    if (data.image_path) {
+                        itemImage.src = data.image_path;
+                    } else {
+                        itemImage.src = ''; // Если изображения нет, очищаем src
+                    }
+
+                    console.log(data);
                     // Открываем модальное окно
                     modal.style.display = 'block';
+
                     const categorySelect = document.getElementById('categorySelect');
                     categorySelect.value = data.categoryId;
                 }
@@ -61,6 +70,20 @@ editButtons.forEach((button) => {
     });
 });
 
+// Обработчик изменения файла изображения
+const itemImageInput = document.getElementById('itemImageInput');
+itemImageInput.addEventListener('change', (e) => {
+    const itemImage = document.getElementById('itemImage');
+    const file = e.target.files[0];
+
+    if (file) {
+        const imageUrl = URL.createObjectURL(file);
+        itemImage.src = imageUrl;
+    } else {
+        itemImage.src = '';
+    }
+});
+
 // Код для отправки данных на сервер при сохранении изменений
 const editSubmitButton = document.getElementById('editSubmit');
 editSubmitButton.addEventListener('click', () => {
@@ -68,6 +91,7 @@ editSubmitButton.addEventListener('click', () => {
     const itemName = document.getElementById('itemName').value;
     const itemPrice = document.getElementById('itemPrice').value;
     const selectedCategoryId = categorySelect.value;
+    const itemImageFile = itemImageInput.files[0]; // Получаем выбранный файл изображения
 
 
     const categoryError = document.getElementById('categoryError'); // Элемент для отображения ошибки
