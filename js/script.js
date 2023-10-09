@@ -79,6 +79,7 @@ itemImageInput.addEventListener('change', (e) => {
     if (file) {
         const imageUrl = URL.createObjectURL(file);
         itemImage.src = imageUrl;
+
     } else {
         itemImage.src = '';
     }
@@ -93,7 +94,6 @@ editSubmitButton.addEventListener('click', () => {
     const selectedCategoryId = categorySelect.value;
     const itemImageFile = itemImageInput.files[0]; // Получаем выбранный файл изображения
 
-
     const categoryError = document.getElementById('categoryError'); // Элемент для отображения ошибки
 
     // Проверяем, выбрана ли категория
@@ -105,17 +105,23 @@ editSubmitButton.addEventListener('click', () => {
     // Очищаем ошибку, если категория выбрана
     categoryError.textContent = '';
 
-    
-    // Отправляем AJAX-запрос на сервер для обновления данных о товаре
-    // Внесите изменения в JSON-объект для запроса
+    // Создаем объект с данными для отправки
+    const requestData = {
+        itemId: itemId,
+        itemName: itemName,
+        itemPrice: itemPrice,
+        categoryId: selectedCategoryId,
+    };
+
+    // Создаем объект с изображением для отправки (если оно выбрано)
+    if (itemImageFile) {
+        requestData.itemImage = itemImageFile;
+    }
+
+    // Отправляем данные на сервер в формате JSON
     fetch('/config/update.php', {
         method: 'POST',
-        body: JSON.stringify({
-            itemId: itemId, // Добавьте itemId
-            itemName: itemName,
-            itemPrice: itemPrice,
-            categoryId: selectedCategoryId,
-        }),
+        body: JSON.stringify(requestData),
         headers: {
             'Content-Type': 'application/json'
         }
