@@ -1,3 +1,4 @@
+<?php session_start() ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -146,18 +147,21 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
                     </div>
 
                     <a href="" class="btn">В корзину</a>
-
+                    <?php if ($_SESSION["admink"]) { ?>
                     <a href="#" class="btn edit-btn" data-item-id="<?= $row['item_id'] ?>">Изменить</a>
-
                     <a href="/config/delete.php?id=<?= $row['item_id'] ?>" class="btn">Удалить</a>
+                    <?php } ?>
                 </div>
             <?php endwhile; ?>
+            <?php if ($_SESSION["admink"]) { ?>
             <div class="box">
                 <img src="images/menu-1.jpg" alt="">
                 <h3>Новый товар</h3>
                 <div class="price"></div>
                 <a href="/config/addempty.php" class="btn">Добавить</a>
             </div>
+            <?php } ?>
+
         </div>
     </section>
 
@@ -419,6 +423,7 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
             <a href="#review">отзывы</a>
             <a href="#contact">Контакты</a>
             <a href="#blogs">Соц. сети</a>
+            <a href="/config/account.php">Администрирование</a>
         </div>
         <div class="credit">Наши Контакты: <span>+7 (978) 250-47-35</span></div>
     </section>
