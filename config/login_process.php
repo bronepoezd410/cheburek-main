@@ -21,7 +21,6 @@ if (isset($_POST['sublogin'])) {
             $_SESSION["login_email"] = $row['email'];
             $_SESSION["id"] = $row['customer_id'];
             $_SESSION["admink"] = false;
-            var_dump($_SESSION);
             header("location:account.php");
         } else {
             header("location:login.php?loginerror=" . $login);

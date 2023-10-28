@@ -1,14 +1,22 @@
-<?php session_start() ?>
+<?php
+$user_session_id = uniqid();
+// session_id($user_session_id);
+session_start();
+$_SESSION['user_id'] = $user_session_id;
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Безупречная чебуречная</title>
+    <title>Безупречная Чебуречная</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@100;300;400;500;700&display=swap"
@@ -19,11 +27,10 @@
 
 <?php
 require_once 'config/databases.php';
-session_start();
-$sql = "SELECT * FROM `MenuItems` WHERE 1=1"; // '1=1' is used to simplify the WHERE clause construction
+$sql = "SELECT * FROM `MenuItems` WHERE 1=1";
 $result = mysqli_query($induction, $sql);
 
-$sqlcategories = "SELECT * FROM `Categories` WHERE 1=1"; // '1=1' is used to simplify the WHERE clause construction
+$sqlcategories = "SELECT * FROM `Categories` WHERE 1=1";
 $resultcategories = mysqli_query($induction, $sqlcategories);
 ?>
 
@@ -34,22 +41,23 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
     <header class="header">
 
         <a href="" class="logo">
-            <img src="images/logo.png" alt="">
+            <img src="images/zagruzheno.png" alt="">
         </a>
 
         <nav class="navbar">
             <a href="#home">Главная</a>
             <a href="#about">О нас</a>
             <a href="#menu">Меню</a>
-            <a href="#products">Продукты</a>
             <a href="#review">отзывы</a>
-            <a href="#contact">Контакты</a>
-            <a href="#blogs">Соц. сети</a>
+            <a href="#contact">Находимся</a>
+            <a href="#contact">Соц. сети</a>
         </nav>
 
         <div class="icons">
             <div class="fas fa-search" id="search-btn"></div>
-            <div class="fas fa-shopping-cart" id="cart-btn"></div>
+            <div class="fas fa-shopping-cart" id="cart-btn">
+                <span id="cart-count">0</span>
+            </div>
             <div class="fas fa-bars" id="menu-btn"></div>
         </div>
 
@@ -59,32 +67,16 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
         </div>
 
         <div class="cart-items-container">
-            <div class="cart-item">
-                <span class="fas fa-times"></span>
-                <img src="images/cart-item-1.jpg" alt="">
-                <div class="content">
-                    <h3>cart item 02</h3>
-                    <div class="price">$15.99/-</div>
-                </div>
-            </div>
-            <div class="cart-item">
-                <span class="fas fa-times"></span>
-                <img src="images/cart-item-2.jpg" alt="">
-                <div class="content">
-                    <h3>cart item 02</h3>
-                    <div class="price">$15.99/-</div>
-                </div>
-            </div>
-            <div class="cart-item">
-                <span class="fas fa-times"></span>
-                <img src="images/cart-item-3.jpg" alt="">
-                <div class="content">
-                    <h3>cart item 02</h3>
-                    <div class="price">$15.99/-</div>
-                </div>
-            </div>
-            <a href="" class="btn">checkout now</a>
+    <a class="btn" id="show-cart-btn">Показать содержимое корзины</a>
+    <div class="modal" id="cart-modal">
+    <div class="modal-content">
+        <div id="cart-items-list">
+            <!-- Значения списка товаров в корзине будут добавлены динамически -->
         </div>
+        <a href="../config/cart_page.php" class="btn" id="goto-order-page-btn">Перейти к оформлению</a>
+    </div>
+</div>
+
     </header>
 
     <section class="home" id="home">
@@ -102,7 +94,7 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
 
         <div class="row">
             <div class="image">
-                <img src="images/cheb.jpg" alt="">
+                <img src="images/cheb1.jpg" alt="">
             </div>
 
             <div class="content">
@@ -124,7 +116,7 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
     <section class="menu" id="menu">
         <h1 class="heading"><span>Меню</span></h1>
 
-        <div class="menu-sorting-btns">
+        <div class="menu-sorting-btns box-container">
             <button class="sorting-btn" data-category="all">Все</button>
 
             <?php while ($rowcategories = mysqli_fetch_assoc($resultcategories)): ?>
@@ -137,29 +129,28 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
         <div class="box-container">
             <?php while ($row = mysqli_fetch_assoc($result)): ?>
                 <div class="box" data-item-id="<?= $row['item_id'] ?>" data-category="<?= $row['category_id'] ?>">
-                    <img src="<?= $row['image_url'] ?>" alt="">
-
+                    <img style="height: 22rem; border-radius: 10px;" src="<?= $row['image_url'] ?>" alt="">
                     <h3>
                         <?= $row['item_name'] ?>
                     </h3>
                     <div class="price">
-                        <?= $row['price'] ?>₽
+                        <?= $row['price']?>₽
+                        <a href="#" class="btn buy-btn" data-item-id="<?= $row['item_id'] ?>">Добавить в корзину</a>
                     </div>
 
-                    <a href="" class="btn">В корзину</a>
                     <?php if ($_SESSION["admink"]) { ?>
-                    <a href="#" class="btn edit-btn" data-item-id="<?= $row['item_id'] ?>">Изменить</a>
-                    <a href="/config/delete.php?id=<?= $row['item_id'] ?>" class="btn">Удалить</a>
+                        <a href="#" class="btn edit-btn" data-item-id="<?= $row['item_id'] ?>">Изменить</a>
+                        <a href="/config/delete.php?id=<?= $row['item_id'] ?>" class="btn">Удалить</a>
                     <?php } ?>
                 </div>
             <?php endwhile; ?>
             <?php if ($_SESSION["admink"]) { ?>
-            <div class="box">
-                <img src="images/menu-1.jpg" alt="">
-                <h3>Новый товар</h3>
-                <div class="price"></div>
-                <a href="/config/addempty.php" class="btn">Добавить</a>
-            </div>
+                <div class="box">
+                    <img src="images/menu-1.jpg" alt="">
+                    <h3>Новый товар</h3>
+                    <div class="price"></div>
+                    <a href="/config/addempty.php" class="btn">Добавить</a>
+                </div>
             <?php } ?>
 
         </div>
@@ -199,83 +190,6 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
     </div>
 
 
-    <!-- products start-->
-
-    <section class="products" id="products">
-
-        <h1 class="heading">Наши <span>Продукты</span></h1>
-
-        <div class="box-container">
-            <div class="box">
-                <div class="icons">
-                    <a href="" class="fas fa-shopping-cart"></a>
-                    <a href="" class="fas fa-heart"></a>
-                    <a href="" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="images/menu-1.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>fresh cheburek</h3>
-                    <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                    <div class="price">$15.99 <span>$20.99</span></div>
-                </div>
-            </div>
-            <div class="box">
-                <div class="icons">
-                    <a href="" class="fas fa-shopping-cart"></a>
-                    <a href="" class="fas fa-heart"></a>
-                    <a href="" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="images/menu-1.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>fresh cheburek</h3>
-                    <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                    <div class="price">$15.99 <span>$20.99</span></div>
-                </div>
-            </div>
-            <div class="box">
-                <div class="icons">
-                    <a href="" class="fas fa-shopping-cart"></a>
-                    <a href="" class="fas fa-heart"></a>
-                    <a href="" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="images/menu-1.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>fresh cheburek</h3>
-                    <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                    <div class="price">$15.99 <span>$20.99</span></div>
-                </div>
-            </div>
-        </div>
-
-    </section>
-
-    <!-- products end -->
-
-    <!-- review start -->
     <section class="review" id="review">
 
         <h1 class="heading">О<span>тзывы</span></h1>
@@ -297,7 +211,7 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
                     В меню не только сухомятка в виде чебуреков и разного рода фастфуда, но и супчики, что очень
                     понравилось ребёнку! Однозначно порекомендую комплексные обеды (бизнес ланч)!</p>
             </div>
-            <div class="box">
+            <div class="box" >
                 <i class="fa-solid fa-quote-left"></i>
                 <p></p>
                 <img src="images/user3.jpg" class="user" alt="">
@@ -331,81 +245,39 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
             </div>
         </div>
     </section>
-    <!-- rewiew end -->
 
-    <!-- contact start -->
 
     <section class="contact" id="contact">
         <h1 class="heading"><span>МЫ</span> НАХОДИМСЯ</h1>
 
         <div class="row">
+
             <iframe class="map"
                 src="https://yandex.ru/map-widget/v1/?um=constructor%3Abaf7a71ef2837d50981722010bc65959c1d9e9eeba22331bb75bf37a5f8947a2&amp;source=constructor"
                 allowfullscreen="" loading="lazy"></iframe>
 
-            <form action="">
-                <h3>Оставить отзыв</h3>
+            <form name='submit-to-google-sheet'>
+                <h3>Забронировать зал</h3>
+                <span id='msg'></span>
                 <div class="inputBox">
                     <span class="fas fa-user"></span>
-                    <input type="text" placeholder="Имя">
+                    <input type="text" name='text' placeholder="Имя">
                 </div>
                 <div class="inputBox">
                     <span class="fas fa-envelope"></span>
-                    <input type="email" placeholder="Сообщение">
+                    <input type="email" name='email' placeholder="Сообщение">
                 </div>
                 <div class="inputBox">
                     <span class="fas fa-phone"></span>
-                    <input type="number" placeholder="телефон">
+                    <input type="number" name='number' placeholder="телефон">
                 </div>
                 <input type="submit" value="отправить" class="btn">
+
             </form>
+
         </div>
+
     </section>
-    <!-- contact end -->
-
-    <!-- blogs start -->
-    <section class="blogs" id="blogs">
-        <h1 class="heading">НАШ <span>БЛОГ</span></h1>
-
-        <div class="box-container">
-            <div class="box">
-                <div class="image">
-                    <img src="images/blog-1.jpg" alt="">
-                </div>
-                <div class="content">
-                    <a href="#" class="title"> sochnie chebureks</a>
-                    <span>by admin/21 sep 2023</span>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Provident, ea.</p>
-                    <a href="https://vk.link/cheburek_sevas" class="btn">Читать далее</a>
-                </div>
-            </div>
-            <div class="box">
-                <div class="image">
-                    <img src="images/blog-1.jpg" alt="">
-                </div>
-                <div class="content">
-                    <a href="#" class="title"> sochnie chebureks</a>
-                    <span>by admin/21 sep 2023</span>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Provident, ea.</p>
-                    <a href="https://vk.link/cheburek_sevas" class="btn">Читать далее</a>
-                </div>
-            </div>
-            <div class="box">
-                <div class="image">
-                    <img src="images/blog-1.jpg" alt="">
-                </div>
-                <div class="content">
-                    <a href="#" class="title"> sochnie chebureks</a>
-                    <span>by admin/21 sep 2023</span>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Provident, ea.</p>
-                    <a href="https://vk.link/cheburek_sevas" class="btn">Читать далее</a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- blogs end-->
-
-
     <!-- footer start-->
     <section class="footer">
         <div class="share">
@@ -419,21 +291,62 @@ $resultcategories = mysqli_query($induction, $sqlcategories);
             <a href="#home">Главная</a>
             <a href="#about">О нас</a>
             <a href="#menu">Меню</a>
-            <a href="#products">Продукты</a>
             <a href="#review">отзывы</a>
-            <a href="#contact">Контакты</a>
-            <a href="#blogs">Соц. сети</a>
+            <a href="#contact">Находимся</a>
+            <a href="#contact">Соц. сети</a>
             <a href="/config/account.php">Администрирование</a>
         </div>
         <div class="credit">Наши Контакты: <span>+7 (978) 250-47-35</span></div>
     </section>
     <!-- footer end-->
+    <footer class="site-footer">
+        <p>Разработано компанией <a style="color:white; text-decoration: underline;"
+                href="http://rococo-chimera-8f02ff.netlify.app/">ZiM™</a></p>
+        <p> &copy; 2023 - Все права защищены </p>
+    </footer>
+    <style>
+        .site-footer {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background: #711520;
+            color: white;
+            text-decoration:none; 
+            font-size: 150%;
+        }
+    </style>
 
 
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/script.js"></script>
 
-
-    <script src="js/script.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Ваш код, использующий jQuery
+        });
+        
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzzLL9ZT1wBRahWSYkrXfRLSrtB8_B2AgiVCilIZrX1hUMt4GUrj8Tom_L2vHGkyx7w6A/exec'
+        const form = document.forms['submit-to-google-sheet']
+        const msg = document.getElementById("msg")
+        
+        form.addEventListener('submit', e => {
+            e.preventDefault()
+            fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+            .then(response => {
+                msg.innerHTML = "Отправлено"
+                setTimeout(function () {
+                        msg.innerHTML = ""
+                    }, 50)
+                    form.reset()
+                })
+                .catch(error => console.error('Error!', error.message))
+            })
+            </script>
 </body>
 
+            <style>
+
+                
+            </style>
 </html>

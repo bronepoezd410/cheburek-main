@@ -1,0 +1,60 @@
+body {
+    font-family: 'Roboto', sans-serif; /* Используем шрифт Roboto */
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5; /* Фоновый цвет страницы */
+    color: #333; /* Цвет текста */
+}
+
+h2 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Стили для таблицы */
+table {
+    width: 100%;
+    max-width: 800px; /* ограничиваем максимальную ширину таблицы */
+    border-collapse: collapse;
+}
+table th, table td {
+    border: 1px solid #888;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Кнопка */
+input[type="submit"] {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #0099cc;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+input[type="submit"]:hover {
+    background-color: #0077aa; /* меняем цвет кнопки при наведении */
+}
+
+/* Стили формы */
+form {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}

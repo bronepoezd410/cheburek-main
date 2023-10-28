@@ -7,7 +7,6 @@ document.querySelector('#menu-btn').onclick = () => {
 }
 
 let cartItem = document.querySelector('.cart-items-container');
-
 document.querySelector('#cart-btn').onclick = () => {
     cartItem.classList.toggle('active');
 }
@@ -26,6 +25,7 @@ window.onscroll = () => {
     searchForm.classList.remove('active');
     cartItem.classList.remove('active');
 }
+
 
 
 
@@ -234,3 +234,113 @@ const allButton = document.querySelector('.sorting-btn[data-category="all"]');
 allButton.addEventListener('click', () => {
     filterItems('all');
 });
+
+// Функция для обновления количества в корзине
+function updateCartCount() {
+    $.ajax({
+        url: '../config/get_cart_count.php', // Путь к серверному скрипту, который вернет количество товаров в корзине
+        type: 'GET',
+        success: function(data) {
+            // Обновляем элемент с количеством
+            $('#cart-count').text(data);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+$(document).ready(function() {
+    $(".buy-btn").click(function(e) {
+        e.preventDefault();
+        var item_id = $(this).data("item-id");
+        var quantity = 1; // Вы можете задать желаемое количество товара
+        $.ajax({
+            type: "POST",
+            url: "../config/add_to_cart.php",
+            data: { item_id: item_id, quantity: quantity },
+            success: function(response) {
+                // Обработка успешного добавления товара
+                updateCartCount();
+                alert(response); // Вывод сообщения пользователю
+            },
+        });
+    });
+});
+
+
+
+
+
+
+
+
+// Обработчик события для открытия модального окна
+$("#open-modal-button").click(function() {
+    $.ajax({
+        type: "GET",
+        url: "../config/get_cart_items.php", // Путь к серверному скрипту для получения товаров в корзине
+        dataType: "json",
+        success: function(data) {
+            if (data.length > 0) {
+                // Очищаем содержимое модального окна
+                $("#modal-content").empty();
+
+                // Создаем список товаров и добавляем его в модальное окно
+                var itemList = $("<ul>");
+                $.each(data, function(index, item) {
+                    var listItem = $("<li>").text(item.item_name + " - " + item.quantity);
+                    itemList.append(listItem);
+                });
+                $("#modal-content").append(itemList);
+            } else {
+                // Если корзина пуста, отобразите сообщение
+                $("#modal-content").text("Корзина пуста.");
+            }
+        }
+    });
+});
+
+// Открывает модальное окно корзины
+document.querySelector('#show-cart-btn').addEventListener('click', function() {
+    // Отправляем запрос на серверный скрипт для получения товаров в корзине
+    fetch('../config/get_cart_items.php')
+    .then(response => response.json())
+    .then(data => {
+        const cartItemsList = document.querySelector('#cart-items-list');
+        cartItemsList.innerHTML = '';  // Очищаем список
+
+        if (data.length > 0) {
+            data.forEach(item => {
+                // Создаем HTML-элемент карточки для каждого товара
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';   // Используем класс для стилизации карточки
+                
+                // Внутри карточки сгенерируем HTML с изображением товара
+                const innerHtml = `
+                    <div class="item-image-container">
+                        <img class="item-image" src="${item.image_url}" alt="${item.item_name}">
+                    </div>
+                    <div class="item-info">
+                        <h2 class="item-title">${item.item_name}</h2>
+                        <p class="item-quantity">Количество: ${item.quantity}</p>
+                        <p class="item-price">Цена: ${item.price}</p>
+                        <br>
+                    </div>`;
+                itemCard.innerHTML = innerHtml;
+                cartItemsList.appendChild(itemCard);
+            });
+            } else {
+                // Если корзина пуста, отобразите сообщение
+                const emptyCartMessage = document.createElement('p');
+                emptyCartMessage.textContent = 'Корзина пуста';
+                cartItemsList.appendChild(emptyCartMessage);
+            }
+        });
+
+    // Открываем модальное окно
+    document.querySelector('#cart-modal').style.display = 'block';
+});
+
+
+
